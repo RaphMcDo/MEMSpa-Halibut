@@ -1,0 +1,860 @@
+---
+title: "Product Likelihood with Spatial Random Field"
+author: "Jiaxin Luo and Raphaël McDonald"
+date: "2022/2/23"
+output: pdf_document
+---
+
+# For 2017
+
+```{r}
+# Clear memory
+rm(list=ls())
+
+library(TMB) 
+# Call TMB function value
+compile("prodlikd_spatial_simulations.cpp")
+# Dynamically link the C++ code
+dyn.load(dynlib("prodlikd_spatial_simulations"))
+
+# Logit function
+logitp=function(p){log(p/(1-p))}
+# Inverse logist function
+logitpi=function(t){exp(t)/(1+exp(t))}
+
+library(sp)
+library(rgdal)
+#To switch for lat-long and project it on a flat surface since the earth is a global
+prj4s=CRS("+init=epsg:4326")
+utm.prj4s=CRS("+init=epsg:32620")
+
+load("anonymized_data.RData")
+load("anonymized_data_loc.RData")
+
+newlist_17_1000=list(lognut=factor(NA),lognunt=factor(NA))
+# Construct an R object (f) that represents our C++ function
+# use map and newlist debug
+# Fix lognu at 0
+f_17_1000 = MakeADFun(data_17_1000,param_17_1000,random=c("omegat","omegant"),
+                     DLL="prodlikd_spatial_simulations",map=newlist_17_1000,silent=TRUE)
+fit_17_1000 = nlminb(f_17_1000$par,f_17_1000$fn,f_17_1000$gr)
+# Calculate standard deviations of all model parameters
+sdr_17_1000 = sdreport(f_17_1000)
+# The estimated parameters and corresponding standard deviations
+sum_sdr17_1000 = summary(sdr_17_1000)
+
+# C++ file which defines the objective function (usually the negative log likelihood) 
+# R file which sets up data, calls the C++ function, and minimizes the objective function.
+# Minimized negative log likelihood
+fit_17_1000$objective
+
+## Estimated Lambdas 
+# 2017 without temperature
+# For target species
+head(sum_sdr17_1000[row.names(sum_sdr17_1000) %in% "ldat", ])
+dim(sum_sdr17_1000[row.names(sum_sdr17_1000) %in% "ldat", ])
+lamt_est_17_1000 = data.frame(sum_sdr17_1000[row.names(sum_sdr17_1000) %in% "ldat", ])
+head(lamt_est_17_1000)
+data2017$lamt_se_17_1000 = lamt_est_17_1000$Std..Error
+data2017$lamt_17_1000 = lamt_est_17_1000$Estimate
+# For non-target species
+head(sum_sdr17_1000[row.names(sum_sdr17_1000) %in% "ldant", ])
+dim(sum_sdr17_1000[row.names(sum_sdr17_1000) %in% "ldant", ])
+lamnt_est_17_1000 = data.frame(sum_sdr17_1000[row.names(sum_sdr17_1000) %in% "ldant", ])
+head(lamnt_est_17_1000)
+data2017$lamnt_se_17_1000 = lamnt_est_17_1000$Std..Error
+data2017$lamnt_17_1000 = lamnt_est_17_1000$Estimate
+
+
+```
+
+
+# For 2018
+
+```{r}
+
+
+newlist_18_1000=list(lognut=factor(NA),lognunt=factor(NA))
+# Construct an R object (f) that represents our C++ function
+# use map and newlist debug
+# Fix lognu at 0
+f_18_1000 = MakeADFun(data_18_1000,param_18_1000,random=c("omegat","omegant"),
+                     DLL="prodlikd_spatial_simulations",map=newlist_18_1000,silent=TRUE)
+fit_18_1000 = nlminb(f_18_1000$par,f_18_1000$fn,f_18_1000$gr)
+# Calculate standard deviations of all model parameters
+sdr_18_1000 = sdreport(f_18_1000)
+# The estimated parameters and corresponding standard deviations
+sum_sdr18_1000 = summary(sdr_18_1000)
+
+# C++ file which defines the objective function (usually the negative log likelihood) 
+# R file which sets up data, calls the C++ function, and minimizes the objective function.
+# Minimized negative log likelihood
+fit_18_1000$objective
+
+## Estimated Lambdas 
+# 2018 without temperature
+# For target species
+head(sum_sdr18_1000[row.names(sum_sdr18_1000) %in% "ldat", ])
+dim(sum_sdr18_1000[row.names(sum_sdr18_1000) %in% "ldat", ])
+lamt_est_18_1000 = data.frame(sum_sdr18_1000[row.names(sum_sdr18_1000) %in% "ldat", ])
+head(lamt_est_18_1000)
+data2018$lamt_se_18_1000 = lamt_est_18_1000$Std..Error
+data2018$lamt_18_1000 = lamt_est_18_1000$Estimate
+# For non-target species
+head(sum_sdr18_1000[row.names(sum_sdr18_1000) %in% "ldant", ])
+dim(sum_sdr18_1000[row.names(sum_sdr18_1000) %in% "ldant", ])
+lamnt_est_18_1000 = data.frame(sum_sdr18_1000[row.names(sum_sdr18_1000) %in% "ldant", ])
+head(lamnt_est_18_1000)
+data2018$lamnt_se_18_1000 = lamnt_est_18_1000$Std..Error
+data2018$lamnt_18_1000 = lamnt_est_18_1000$Estimate
+
+saveRDS(data2018, file = "data2018_1000_prodsp.rds")
+
+```
+
+
+# For 2019
+
+```{r}
+
+newlist_19_1000=list(lognut=factor(NA),lognunt=factor(NA))
+# Construct an R object (f) that represents our C++ function
+# use map and newlist debug
+# Fix lognu at 0
+f_19_1000 = MakeADFun(data_19_1000,param_19_1000,random=c("omegat","omegant"),
+                     DLL="prodlikd_spatial_simulations",map=newlist_19_1000,silent=TRUE)
+fit_19_1000 = nlminb(f_19_1000$par,f_19_1000$fn,f_19_1000$gr)
+# Calculate standard deviations of all model parameters
+sdr_19_1000 = sdreport(f_19_1000)
+# The estimated parameters and corresponding standard deviations
+sum_sdr19_1000 = summary(sdr_19_1000)
+
+# C++ file which defines the objective function (usually the negative log likelihood) 
+# R file which sets up data, calls the C++ function, and minimizes the objective function.
+# Minimized negative log likelihood
+fit_19_1000$objective
+
+## Estimated Lambdas 
+# 2019 without temperature
+# For target species
+head(sum_sdr19_1000[row.names(sum_sdr19_1000) %in% "ldat", ])
+dim(sum_sdr19_1000[row.names(sum_sdr19_1000) %in% "ldat", ])
+lamt_est_19_1000 = data.frame(sum_sdr19_1000[row.names(sum_sdr19_1000) %in% "ldat", ])
+head(lamt_est_19_1000)
+data2019$lamt_se_19_1000 = lamt_est_19_1000$Std..Error
+data2019$lamt_19_1000 = lamt_est_19_1000$Estimate
+# For non-target species
+head(sum_sdr19_1000[row.names(sum_sdr19_1000) %in% "ldant", ])
+dim(sum_sdr19_1000[row.names(sum_sdr19_1000) %in% "ldant", ])
+lamnt_est_19_1000 = data.frame(sum_sdr19_1000[row.names(sum_sdr19_1000) %in% "ldant", ])
+head(lamnt_est_19_1000)
+data2019$lamnt_se_19_1000 = lamnt_est_19_1000$Std..Error
+data2019$lamnt_19_1000 = lamnt_est_19_1000$Estimate
+
+saveRDS(data2019, file = "data2019_1000_prodsp.rds")
+
+```
+
+# For 2020 
+
+```{r data}
+
+newlist_20_1000=list(lognut=factor(NA),lognunt=factor(NA))
+# Construct an R object (f) that represents our C++ function
+# use map and newlist debug
+# Fix lognu at 0
+f_20_1000 = MakeADFun(data_20_1000,param_20_1000,random=c("omegat","omegant"),
+                     DLL="prodlikd_spatial_simulations",map=newlist_20_1000,silent=TRUE)
+fit_20_1000 = nlminb(f_20_1000$par,f_20_1000$fn,f_20_1000$gr)
+# Calculate standard deviations of all model parameters
+sdr_20_1000 = sdreport(f_20_1000)
+# The estimated parameters and corresponding standard deviations
+sum_sdr20_1000 = summary(sdr_20_1000)
+
+#It works! The model works great on 2020 too!
+
+# C++ file which defines the objective function (usually the negative log likelihood) 
+# R file which sets up data, calls the C++ function, and minimizes the objective function.
+# Minimized negative log likelihood
+fit_20_1000$objective
+
+## Estimated Lambdas 
+# 2020 without temperature
+# For target species
+head(sum_sdr20_1000[row.names(sum_sdr20_1000) %in% "ldat", ])
+dim(sum_sdr20_1000[row.names(sum_sdr20_1000) %in% "ldat", ])
+lamt_est_20_1000 = data.frame(sum_sdr20_1000[row.names(sum_sdr20_1000) %in% "ldat", ])
+head(lamt_est_20_1000)
+data2020$lamt_se_20_1000 = lamt_est_20_1000$Std..Error
+data2020$lamt_20_1000 = lamt_est_20_1000$Estimate
+# For non-target species
+head(sum_sdr20_1000[row.names(sum_sdr20_1000) %in% "ldant", ])
+dim(sum_sdr20_1000[row.names(sum_sdr20_1000) %in% "ldant", ])
+lamnt_est_20_1000 = data.frame(sum_sdr20_1000[row.names(sum_sdr20_1000) %in% "ldant", ])
+head(lamnt_est_20_1000)
+data2020$lamnt_se_20_1000 = lamnt_est_20_1000$Std..Error
+data2020$lamnt_20_1000 = lamnt_est_20_1000$Estimate
+
+# saveRDS(data2020, file = "data2020_1000_prodsp.rds")
+
+
+```
+
+
+## Dirichlet
+
+```{r}
+library(gissr)
+library(deldir)
+library(spatstat)
+library(alphahull)
+
+bid = read.csv("blockIDkey.csv", header = T)
+loc_id = cbind(bid$lon.DecDeg, bid$lat.DecDeg)
+# Plot Block ID
+plot(loc_id, xlab="Long", ylab="Lat", main="blockIDkey", pch=20)
+
+# With Alpha Hull
+# Find the boundary points using ashape
+# Alpha controls the detail of the boundary
+bound_a = ashape(loc_id, alpha = 0.084)
+bound_a_index = bound_a$alpha.extremes
+plot(loc_id, xlab="Long", ylab="Lat", main="blockIDkey and boundary", pch=20)
+points(loc_id[bound_a_index, ], col=2, pch=20)
+
+```
+
+### alpha = 0.084
+
+```{r}
+# Boundary points and survey stations
+bound_a_pos = loc_id[bound_a_index, ]
+plot(bound_a_pos, pch=20)
+# Extracted block ID boundary and imported boundary
+plot(bound_a_pos, xlab="Long", ylab="Lat", main=" Survey Area Boundary Coordinate", pch=20)
+# points(surveyPolyLL$X, surveyPolyLL$Y, col="red", pch=20)
+
+# To find the corresponding index
+bound_a_pos = data.frame(long=bound_a_pos[,1], lat=bound_a_pos[,2])
+bound_a_pos$num = 1:length(bound_a_pos$long)
+
+# Fix the boundary 
+dim(bound_a_pos)
+bound_a_pos = bound_a_pos[-c(12,15:21,57,58,579,581,588,594,595,598,599,601,604,605,668,669,828,
+                          834,840,844,845,841,835,773,751,755,320,311:313,326,340,357,361,364,365,
+                          360,356,353,336,325,452,472,495,507,678,685,686,634,630,635,639,638,640,
+                          323,316,306),]
+dim(bound_a_pos)
+plot(bound_a_pos$long, bound_a_pos$lat, pch=20)
+
+# utm.prj4s2<-CRS("+init=epsg:32619")
+
+# To switch for lat-long for block id
+# and project it on a flat surface since the earth is a global 
+tf_bound_a_pos = SpatialPoints(bound_a_pos,proj4string = prj4s)
+tf_bound_a_pos = spTransform(tf_bound_a_pos,utm.prj4s)
+tf_bound_a_pos = data.frame(long = tf_bound_a_pos@coords[,1], lat = tf_bound_a_pos@coords[,2])
+plot(tf_bound_a_pos)
+
+# List the boundary points in anit-clockwise order
+tf_bound_a_pos2 = sort_points(tf_bound_a_pos, "lat", "long", clockwise = FALSE)
+tf_bound_a_pos2 = data.frame(long = tf_bound_a_pos2$long, lat = tf_bound_a_pos2$lat, num=1:length(bound_a_pos$long))
+
+# Creates an object of class "ppp" representing a point pattern dataset in the two-dimensional plane
+pp_17=ppp(data2017$LONGITUDE_proj, data2017$LATITUDE_proj, window=owin(poly=list(x=tf_bound_a_pos2$long, y=tf_bound_a_pos2$lat)))
+dpp_17 = dirichlet(pp_17)
+
+# Creates an object of class "ppp" representing a point pattern dataset in the two-dimensional plane
+pp_18=ppp(data2018$LONGITUDE_proj, data2018$LATITUDE_proj, window=owin(poly=list(x=tf_bound_a_pos2$long, y=tf_bound_a_pos2$lat)))
+dpp_18 = dirichlet(pp_18)
+
+# Creates an object of class "ppp" representing a point pattern dataset in the two-dimensional plane
+pp_19=ppp(data2019$LONGITUDE_proj, data2019$LATITUDE_proj, window=owin(poly=list(x=tf_bound_a_pos2$long, y=tf_bound_a_pos2$lat)))
+dpp_19 = dirichlet(pp_19)
+
+# Creates an object of class "ppp" representing a point pattern dataset in the two-dimensional plane
+pp_20=ppp(data2020$LONGITUDE_proj, data2020$LATITUDE_proj, window=owin(poly=list(x=tf_bound_a_pos2$long, y=tf_bound_a_pos2$lat)))
+dpp_20 = dirichlet(pp_20)
+
+```
+
+### Dirichlet plot
+
+```{r}
+library(sf)
+tf_bound_a_pos22 = tf_bound_a_pos2[926, ]
+tf_bound_a_pos22[1:64, ] =
+  tf_bound_a_pos2[c(918,921,925,929,932,936,935,934,933,931,930,927,926,924,923,922,920,919,
+                    928,937:953,955,954,956,958,960,957,959,40,48,55,61,59,66,67,76,84,87,94,
+                    95,91,97,99,101,102,105,106,110,124), ]
+tf_bound_a_pos22[65:160, ] =
+  tf_bound_a_pos2[c(127,117,120,123,113,116,118,122,125,115,129,134,138,142,148,144,140,136,
+                    131,111,119,128,141,146,150,152,156,158,162,163,166,167,170,176,179,181,
+                    185,186,189,190,194,195,191,196,199,201,202,205,215,214,213,212,207,211,
+                    210,209,206,204,198,192,187,182,177,174,171,164,161,154,151,145,135,133,
+                    130,112,108,107,104,96,92,90,89,83,80,77,75,70,68,64,62,60,57,54,52,46,
+                    43,37), ]
+tf_bound_a_pos22[161:250, ] =
+  tf_bound_a_pos2[c(36,27,29,28,23,17,14,12,10,13,15,19,22,20,18,6,5,2,963,961,962,1,3,4,
+                    7:9,11,16,21,24,25,26,33,35,32,30,31,34,38,39,42,45,49,41,44,47,50,51,53,
+                    56,58,63,65,69,73,81,86,78,71,72,74,79,82,85,88,93,98,100,103,109,114,121,
+                    126,132,137,139,143,147,149,153,155,157,159,160,165,168,169,172,173), ]
+tf_bound_a_pos22[251:371, ] =
+  tf_bound_a_pos2[c(175,178,180,183,184,188,193,197,200,203,208,216:235,250,260,265,272,280,
+                    283,294,295,292,290,286,285,288,287,281,278,277,276,274,271,270,269,266,
+                    261,254,247,245,240,236,241,237,242,238,243,248,244,239,246,251,255,252,
+                    256,253,249,257:259,262:264,267,268,273,275,279,282,284,289,291,293,
+                    296:306,309,307,308,310:321,323,328,332,331), ]
+tf_bound_a_pos22[372:444, ] =
+  tf_bound_a_pos2[c(327,325,322,324,330,326,329,333:349,352,351,350,353:398), ]
+tf_bound_a_pos22[445:545, ] =
+  tf_bound_a_pos2[c(401,400,399,402:405,426,447,460,469,486,491,512,517,522,530,523,531,524,
+                    519,516,526,535,540,549,557,559,555,563,571,576,577,574,560,562,570,572,
+                    567,564,566,569,558,551,548,543,545,542,544,541,538,537,532,527,533,528,
+                    525,521,518,508,514,510,506,511,507,504,499,505,501,496,502,497,503,498,
+                    493,487,483,480,484,482,479,477,476,474,473,470,466,461,458,457,463,459,
+                    455,453,445,444,449,446,451,450,441), ]
+tf_bound_a_pos22[546:615, ] =
+  tf_bound_a_pos2[c(439,437,443,440,438,436,427,409,406,407,413,431,435,434,424,420,428,425,
+                    422,418,415,411,408,417,414,410,421,416,412,423,419,432,430,429,433,442,
+                    448,452,454,456,462,464,465,467,468,471,472,475,478,481,485,488,489,490,
+                    492,494,495,500,509,513,515,520,539,534,536,539,546,547,550,552), ]
+tf_bound_a_pos22[616:688, ] =
+  tf_bound_a_pos2[c(553,554,556,561,565,568,573,575,578:612,620,619,618,617,616,615,614,613,
+                    627,626,625,624,623,622,621,633,632,631,630,629,628,639,638,637,636,635,
+                    634,645,644,643), ]
+tf_bound_a_pos22[689:785, ] =
+  tf_bound_a_pos2[c(642,641,640,650,649,648,647,646,656,655,654,653,652,651,657:739), ]
+tf_bound_a_pos22[786:874, ] =
+  tf_bound_a_pos2[c(750,756,764,769,780,777,776,773,770,779,766,765,761,754,752,749,746,744,
+                    751,757,760,768,778,775,772,767,763,759,758,747,745,742,741,740,743,753,
+                    748,755,762,774,771,781,783,782,784:786,790,803,815:818,811,810,806,808,
+                    798,800,802,792,794:796,799,804,805,807,797,791,787:789,793,801,809,812,
+                    819,822,824,825,823,814,813,821,820,826,828,827), ]
+tf_bound_a_pos22[875:963, ] = tf_bound_a_pos2[c(829:913,915,914,916:917), ]
+
+tf_bound_a_pos22 = data.frame(long = tf_bound_a_pos22$long, lat = tf_bound_a_pos22$lat,
+                              num=1:length(tf_bound_a_pos22$long))
+
+
+load("good_bound.RData")
+make_20<-st_as_sf(tf_bound_a_pos22,coords=c("long","lat"))
+st_crs(make_20)<-CRS("+init=epsg:32619")
+make_20<-st_transform(make_20,utm.prj4s)
+
+# Creates an object of class "ppp" representing a point pattern dataset in the two-dimensional plane
+pp_17=ppp(data2017$LONGITUDE_proj, data2017$LATITUDE_proj, window=owin(poly=list(x=st_coordinates(make_20)[,1],y=st_coordinates(make_20)[,2])))
+dpp_17 = dirichlet(pp_17)
+plot(dpp_17,border="black",main="")
+plot(pp_17,add=TRUE,chars=20,col="red", main="Dirichlet Tiles Plot for 2017")
+
+# Creates an object of class "ppp" representing a point pattern dataset in the two-dimensional plane
+pp_18=ppp(data2018$LONGITUDE_proj, data2018$LATITUDE_proj, window=owin(poly=list(x=st_coordinates(make_20)[,1],y=st_coordinates(make_20)[,2])))
+dpp_18 = dirichlet(pp_18)
+plot(dpp_18,border="black",main="")
+plot(pp_18,add=TRUE,chars=20,col="red")
+
+# Creates an object of class "ppp" representing a point pattern dataset in the two-dimensional plane
+pp_19=ppp(data2019$LONGITUDE_proj, data2019$LATITUDE_proj, window=owin(poly=list(x=st_coordinates(make_20)[,1],y=st_coordinates(make_20)[,2])))
+dpp_19 = dirichlet(pp_19)
+plot(dpp_19,border="black",main="")
+plot(pp_19,add=TRUE,chars=20,col="red")
+
+data2020$LONGITUDE_proj[data2020$STATION==506]<-data2020$LONGITUDE_proj[data2020$STATION==506]*0.993
+
+data2020$LONGITUDE_proj[data2020$STATION==578]<-data2020$LONGITUDE_proj[data2020$STATION==578]*0.995
+
+data2020$LONGITUDE_proj[data2020$STATION==556]<-data2020$LONGITUDE_proj[data2020$STATION==556]*1.003
+
+data2020$LATITUDE_proj[data2020$STATION==552]<-data2020$LATITUDE_proj[data2020$STATION==552]*1.001
+
+pp_20=ppp(data2020$LONGITUDE_proj, data2020$LATITUDE_proj, window=owin(poly=list(x=st_coordinates(make_20)[,1],y=st_coordinates(make_20)[,2])))
+
+dpp_20 = dirichlet(pp_20)
+
+plot(dpp_20,border="black",main="")
+
+plot(pp_20,add=TRUE,chars=20,col="red")
+
+# points(data2020$LONGITUDE_proj[data2020$STATION%in%c(506,552,578,556)], data2020$LATITUDE_proj[data2020$STATION%in%c(506,552,578,556)], pch=16, col="blue") # points that were nudged
+#There are some issues here, not major ones, but a couple cells have bits associated with points that are technically across land
+
+```
+
+## Area
+
+```{r}
+# Area
+## 2017
+wts_17 = sapply(tiles(dpp_17),area.owin)
+cat("Sum of weights:\n")
+print(sum(wts_17)/1000000)
+# Target
+dweight_ave_17t = sum((data2017$lamt_17_1000)*wts_17)/sum(wts_17)
+dweight_ave_17t
+# Standard error calculation
+wts_17 = as.matrix(wts_17)
+# wi/sum(wi)
+wts_172 = wts_17/(sum(wts_17))
+# covariance matrix for estimated lambda t
+cov_17 = sdr_17_1000$cov
+cov_17t = cov_17[1:nrow(data2017), 1:nrow(data2017)]
+plot((data2017$lamt_se_17_1000)^2,diag(cov_17t))
+sum(((data2017$lamt_se_17_1000)^2-diag(cov_17t)))
+# Standard error for Dirichlet method 
+se2_dir_17t = t(wts_172)%*%cov_17t%*%wts_172
+sqrt(se2_dir_17t)
+# Non-target
+dweight_ave_17nt = sum((data2017$lamnt_17_1000)*wts_17)/sum(wts_17)
+dweight_ave_17nt
+# covariance matrix for estimated lambda t
+cov_17nt = cov_17[(nrow(data2017)+1):(nrow(data2017)*2), (nrow(data2017)+1):(nrow(data2017)*2)]
+plot((data2017$lamnt_se_17_1000)^2,diag(cov_17nt))
+sum(((data2017$lamnt_se_17_1000)^2-diag(cov_17nt)))
+# Standard error for Dirichlet method 
+se2_dir_17nt = t(wts_172)%*%cov_17nt%*%wts_172
+sqrt(se2_dir_17nt)
+
+```
+
+```{r}
+# Area
+## 2018
+wts_18 = sapply(tiles(dpp_18),area.owin)
+cat("Sum of weights:\n")
+print(sum(wts_18)/1000000)
+# Target
+dweight_ave_18t = sum((data2018$lamt_18_1000)*wts_18)/sum(wts_18)
+dweight_ave_18t
+# Standard error calculation
+wts_18 = as.matrix(wts_18)
+# wi/sum(wi)
+wts_182 = wts_18/(sum(wts_18))
+# covariance matrix for estimated lambda t
+cov_18 = sdr_18_1000$cov
+cov_18t = cov_18[1:nrow(data2018), 1:nrow(data2018)]
+plot((data2018$lamt_se_18_1000)^2,diag(cov_18t))
+sum(((data2018$lamt_se_18_1000)^2-diag(cov_18t)))
+# Standard error for Dirichlet method 
+se2_dir_18t = t(wts_182)%*%cov_18t%*%wts_182
+sqrt(se2_dir_18t)
+# Non-target
+dweight_ave_18nt = sum((data2018$lamnt_18_1000)*wts_18)/sum(wts_18)
+dweight_ave_18nt
+# covariance matrix for estimated lambda t
+cov_18nt = cov_18[(nrow(data2018)+1):(nrow(data2018)*2), (nrow(data2018)+1):(nrow(data2018)*2)]
+plot((data2018$lamnt_se_18_1000)^2,diag(cov_18nt))
+sum(((data2018$lamnt_se_18_1000)^2-diag(cov_18nt)))
+# Standard error for Dirichlet method 
+se2_dir_18nt = t(wts_182)%*%cov_18nt%*%wts_182
+sqrt(se2_dir_18nt)
+
+```
+
+```{r}
+# Area
+## 2019
+wts_19 = sapply(tiles(dpp_19),area.owin)
+cat("Sum of weights:\n")
+print(sum(wts_19)/1000000)
+# Target
+dweight_ave_19t = sum((data2019$lamt_19_1000)*wts_19)/sum(wts_19)
+dweight_ave_19t
+# Standard error calculation
+wts_19 = as.matrix(wts_19)
+# wi/sum(wi)
+wts_192 = wts_19/(sum(wts_19))
+# covariance matrix for estimated lambda t
+cov_19 = sdr_19_1000$cov
+cov_19t = cov_19[1:nrow(data2019), 1:nrow(data2019)]
+plot((data2019$lamt_se_19_1000)^2,diag(cov_19t))
+sum(((data2019$lamt_se_19_1000)^2-diag(cov_19t)))
+# Standard error for Dirichlet method 
+se2_dir_19t = t(wts_192)%*%cov_19t%*%wts_192
+sqrt(se2_dir_19t)
+# Non-target
+dweight_ave_19nt = sum((data2019$lamnt_19_1000)*wts_19)/sum(wts_19)
+dweight_ave_19nt
+# covariance matrix for estimated lambda t
+cov_19nt = cov_19[(nrow(data2019)+1):(nrow(data2019)*2), (nrow(data2019)+1):(nrow(data2019)*2)]
+plot((data2019$lamnt_se_19_1000)^2,diag(cov_19nt))
+sum(((data2019$lamnt_se_19_1000)^2-diag(cov_19nt)))
+# Standard error for Dirichlet method 
+se2_dir_19nt = t(wts_192)%*%cov_19nt%*%wts_192
+sqrt(se2_dir_19nt)
+
+```
+
+```{r}
+# Area
+## 2020
+wts_20 = sapply(tiles(dpp_20),area.owin)
+cat("Sum of weights:\n")
+print(sum(wts_20)/1000000)
+# Target
+dweight_ave_20t = sum((data2020$lamt_20_1000)*wts_20)/sum(wts_20)
+dweight_ave_20t
+# Standard error calculation
+wts_20 = as.matrix(wts_20)
+# wi/sum(wi)
+wts_202 = wts_20/(sum(wts_20))
+# covariance matrix for estimated lambda t
+cov_20 = sdr_20_1000$cov
+cov_20t = cov_20[1:nrow(data2020), 1:nrow(data2020)]
+plot((data2020$lamt_se_20_1000)^2,diag(cov_20t))
+sum(((data2020$lamt_se_20_1000)^2-diag(cov_20t)))
+# Standard error for Dirichlet method 
+se2_dir_20t = t(wts_202)%*%cov_20t%*%wts_202
+sqrt(se2_dir_20t)
+# Non-target
+dweight_ave_20nt = sum((data2020$lamnt_20_1000)*wts_20)/sum(wts_20)
+dweight_ave_20nt
+# covariance matrix for estimated lambda t
+cov_20nt = cov_20[(nrow(data2020)+1):(nrow(data2020)*2), (nrow(data2020)+1):(nrow(data2020)*2)]
+plot((data2020$lamnt_se_20_1000)^2,diag(cov_20nt))
+sum(((data2020$lamnt_se_20_1000)^2-diag(cov_20nt)))
+# Standard error for Dirichlet method 
+se2_dir_20nt = t(wts_202)%*%cov_20nt%*%wts_202
+sqrt(se2_dir_20nt)
+
+```
+
+# Plots
+
+```{r}
+library(ggplot2)
+library(spatstat)
+tess2SPdf <- function(x) {
+  stopifnot(is.tess(x))
+  require(sp)
+  require(spatstat)
+  a <- tiles(x)
+  tess.labels <- names(a)
+  c <- list()
+  for(i in seq(a)){
+
+    b <- as.polygonal(a[[i]])
+    closering <- function(df) {
+                    df[c(seq(nrow(df)), 1), ]
+                 }
+    pieces <- lapply(b$bdry,
+                     function(p) {
+                       Polygon(coords=closering(cbind(p$x,p$y)))
+                     })
+    c[[i]] <- Polygons(pieces, tess.labels[i])
+
+  }
+
+  d <- data.frame()
+  d <- d[seq(x$n),]
+  row.names(d) <- names(x$tiles)
+  return(SpatialPolygonsDataFrame(SpatialPolygons(c), data=d))
+ }
+test_diri<-tess2SPdf(dpp_17)
+diri_17<-st_as_sf(test_diri)
+diri_17$Year<-rep("2017",length(diri_17$geometry))
+diri_17<-cbind(diri_17,data2017$lamt_17_1000,data2017$lamnt_17_1000)
+colnames(diri_17)[2:3]<-c("Index_t","Index_nt")
+test_diri<-tess2SPdf(dpp_18)
+diri_18<-st_as_sf(test_diri)
+diri_18$Year<-rep("2018",length(diri_18$geometry))
+diri_18<-cbind(diri_18,data2018$lamt_18_1000,data2018$lamnt_18_1000)
+colnames(diri_18)[2:3]<-c("Index_t","Index_nt")
+test_diri<-tess2SPdf(dpp_19)
+diri_19<-st_as_sf(test_diri)
+diri_19$Year<-rep("2019",length(diri_19$geometry))
+diri_19<-cbind(diri_19,data2019$lamt_19_1000,data2019$lamnt_19_1000)
+colnames(diri_19)[2:3]<-c("Index_t","Index_nt")
+test_diri<-tess2SPdf(dpp_20)
+diri_20<-st_as_sf(test_diri)
+diri_20$Year<-rep("2020",length(diri_20$geometry))
+diri_20<-cbind(diri_20,data2020$lamt_20_1000,data2020$lamnt_20_1000)
+colnames(diri_20)[2:3]<-c("Index_t","Index_nt")
+all_diri<-rbind(diri_17,diri_18,diri_19,diri_20)
+st_crs(all_diri)<-utm.prj4s
+
+index_t_map<-ggplot()+geom_sf(data=all_diri,aes(fill=Index_t))+facet_wrap(~Year)+theme_bw()+scale_fill_viridis_c(name="Relative Abundance \nIndex")
+
+index_nt_map<-ggplot()+geom_sf(data=all_diri,aes(fill=Index_nt))+facet_wrap(~Year)+theme_bw()+scale_fill_viridis_c(name="Relative Abundance \nIndex")
+
+
+```
+
+
+# Reproducing non-spatial MEM stuff to overlap them
+
+```{r}
+library(TMB) 
+# dyn.unload("prodlikd_spatial_simulations")
+# Call TMB function value
+compile("rep_code.cpp")
+# Dynamically link the C++ code
+dyn.load(dynlib("rep_code"))
+
+load("rep_anon_data.RData")
+load("rep_anon_data_fixed.RData")
+
+# Construct an R object (f) that represents our C++ function
+# MakeADFun calls C++
+f_17 = MakeADFun(data_17, param_17, DLL="rep_code")
+f_17fixed = MakeADFun(data_17fixed, param_17fixed, DLL="rep_code")
+
+# Call TMB function value
+fit_17 = nlminb(f_17$par,f_17$fn,f_17$gr)
+fit_17fixed = nlminb(f_17fixed$par,f_17fixed$fn,f_17fixed$gr)
+# Calculate standard deviations of all model parameters
+sdr_17 = sdreport(f_17)
+# Estimated results for model with actual soak time 
+# summary(sdr_17)
+sdr_17fixed = sdreport(f_17fixed)
+# Estimated results for model with actual soak time 
+# summary(sdr_17fixed)
+
+```
+
+
+# 2018
+
+```{r}
+
+
+
+# Construct an R object (f) that represents our C++ function
+# MakeADFun calls C++
+f_18 = MakeADFun(data_18, param_18, DLL="rep_code")
+f_18fixed = MakeADFun(data_18fixed, param_18fixed, DLL="rep_code")
+
+# Call TMB function value
+fit_18 = nlminb(f_18$par,f_18$fn,f_18$gr)
+fit_18fixed = nlminb(f_18fixed$par,f_18fixed$fn,f_18fixed$gr)
+# Calculate standard deviations of all model parameters
+sdr_18 = sdreport(f_18)
+# Estimated results for model with actual soak time 
+# summary(sdr_18)
+sdr_18fixed = sdreport(f_18fixed)
+# Estimated results for model with actual soak time 
+# summary(sdr_18fixed)
+
+```
+
+# 2019
+
+```{r}
+
+# Construct an R object (f) that represents our C++ function
+# MakeADFun calls C++
+f_19 = MakeADFun(data_19, param_19, DLL="rep_code")
+f_19fixed = MakeADFun(data_19fixed, param_19fixed, DLL="rep_code")
+
+# Call TMB function value
+fit_19 = nlminb(f_19$par,f_19$fn,f_19$gr)
+fit_19fixed = nlminb(f_19fixed$par,f_19fixed$fn,f_19fixed$gr)
+# Calculate standard deviations of all model parameters
+sdr_19 = sdreport(f_19)
+# Estimated results for model with actual soak time 
+# summary(sdr_19)
+sdr_19fixed = sdreport(f_19fixed)
+# Estimated results for model with actual soak time 
+# summary(sdr_19fixed)
+
+```
+
+# 2020
+
+```{r}
+
+
+# Construct an R object (f) that represents our C++ function
+# MakeADFun calls C++
+f_20 = MakeADFun(data_20, param_20, DLL="rep_code")
+f_20fixed = MakeADFun(data_20fixed, param_20fixed, DLL="rep_code")
+
+# Call TMB function value
+fit_20 = nlminb(f_20$par,f_20$fn,f_20$gr)
+fit_20fixed = nlminb(f_20fixed$par,f_20fixed$fn,f_20fixed$gr)
+# Calculate standard deviations of all model parameters
+sdr_20 = sdreport(f_20)
+# Estimated results for model with actual soak time 
+# summary(sdr_20)
+sdr_20fixed = sdreport(f_20fixed)
+# Estimated results for model with actual soak time 
+# summary(sdr_20fixed)
+
+```
+
+# Plotting index for whole area, comparing to non-spatial and spatial
+
+```{r}
+
+spatial_indices<-data.frame(Year=c(2017:2020),ind_t=c(dweight_ave_17t,dweight_ave_18t,dweight_ave_19t,dweight_ave_20t),ind_t_se=c(sqrt(se2_dir_17t),sqrt(se2_dir_18t),sqrt(se2_dir_19t),sqrt(se2_dir_20t)),ind_nt=c(dweight_ave_17nt,dweight_ave_18nt,dweight_ave_19nt,dweight_ave_20nt),ind_nt_se=c(sqrt(se2_dir_17nt),sqrt(se2_dir_18nt),sqrt(se2_dir_19nt),sqrt(se2_dir_20nt)),ID=rep(factor(1),4))
+
+non_spat_indices<-data.frame(Year=c(2017:2020),ind_t=c(f_17$report()$ldat[1],f_18$report()$ldat[1],f_19$report()$ldat[1],f_20$report()$ldat[1]),ind_t_se=c(summary(sdr_17)[4,2],summary(sdr_18)[4,2],summary(sdr_19)[4,2],summary(sdr_20)[4,2]),ind_nt=c(f_17$report()$ldant[1],f_18$report()$ldant[1],f_19$report()$ldant[1],f_20$report()$ldant[1]),ind_nt_se=c(summary(sdr_17)[145,2],summary(sdr_18)[154,2],summary(sdr_19)[127,2],summary(sdr_20)[152,2]),ID=rep(factor(2),4))
+
+all_indices<-rbind(spatial_indices,non_spat_indices)
+
+over_ind_t<-ggplot(data=all_indices)+
+  geom_point(aes(x=Year,y=ind_t,col=ID,shape=ID))+
+  geom_line(aes(x=Year,y=ind_t,col=ID))+
+  geom_linerange(aes(x=Year,ymin=ind_t-ind_t_se,ymax=ind_t+ind_t_se,col=ID))+
+  ylab("Relative Index")+
+  scale_color_discrete(name="Model",labels=c("MEMSpa","MEM"))+
+  scale_shape_discrete(name="Model",labels=c("MEMSpa","MEM"))+
+  theme_bw()
+
+over_ind_nt<-ggplot(data=all_indices)+
+  geom_point(aes(x=Year,y=ind_nt,col=ID,shape=ID))+
+  geom_line(aes(x=Year,y=ind_nt,col=ID))+
+  geom_linerange(aes(x=Year,ymin=ind_nt-ind_nt_se,ymax=ind_nt+ind_nt_se,col=ID))+
+  ylab("Relative Index")+
+  scale_color_discrete(name="Model",labels=c("MEMSpa","MEM"))+
+  scale_shape_discrete(name="Model",labels=c("MEMSpa","MEM"))+
+  theme_bw()
+
+```
+
+## Plot by STRATA (updated STRATUM_ID)
+
+```{r}
+# 2017
+# Plot by area strata (STRATA)
+# Change the STRATA to area ID (5 levels) 
+data2017$areaid2 = factor(data2017$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "1", "1", "2", "2", "2","3", "3", "3","4", "4", "4","5", "5", "5"))
+
+# Plot by depth STRATUM_ID (STRATUM_ID)
+# Change the STRATUM_ID to depth ID (3 levels) 
+data2017$depthid2 = factor(data2017$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "2", "3", "1", "2", "3","1", "2", "3","1", "2", "3","1", "2", "3"))
+
+#2018
+# Plot by area STRATUM_ID (STRATUM_ID)
+# Change the STRATUM_ID to area ID (5 levels) 
+data2018$areaid2 = factor(data2018$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "1", "1", "2", "2", "2","3", "3", "3","4", "4", "4","5", "5", "5"))
+
+# Plot by depth STRATUM_ID (STRATUM_ID)
+# Change the STRATUM_ID to depth ID (3 levels) 
+data2018$depthid2 = factor(data2018$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "2", "3", "1", "2", "3","1", "2", "3","1", "2", "3","1", "2", "3"))
+
+# 2019
+# Plot by area STRATUM_ID (STRATUM_ID)
+# Change the STRATUM_ID to area ID (5 levels) 
+data2019$areaid2 = factor(data2019$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "1", "1", "2", "2", "2","3", "3", "3","4", "4", "4","5", "5", "5"))
+
+# Plot by depth STRATUM_ID (STRATUM_ID)
+# Change the STRATUM_ID to depth ID (3 levels) 
+data2019$depthid2 = factor(data2019$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "2", "3", "1", "2", "3","1", "2", "3","1", "2", "3","1", "2", "3"))
+
+# 2020
+# Plot by area STRATUM_ID (STRATUM_ID)
+# Change the STRATUM_ID to area ID (5 levels) 
+data2020$areaid2 = factor(data2020$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "1", "1", "2", "2", "2","3", "3", "3","4", "4", "4","5", "5", "5"))
+
+# Plot by depth STRATUM_ID (STRATUM_ID)
+# Change the STRATUM_ID to depth ID (3 levels) 
+data2020$depthid2 = factor(data2020$STRATUM_ID,
+  levels=c("H11","H12","H13","H21","H22","H23","H31","H32","H33","H41","H42","H43","H51","H52","H53"),
+  labels = c("1", "2", "3", "1", "2", "3","1", "2", "3","1", "2", "3","1", "2", "3"))
+
+
+```
+
+## Boxplot
+
+```{r}
+library(RColorBrewer)
+col1 = c(brewer.pal(3,"Blues"))
+col2 = c(brewer.pal(3,"Reds"))
+col3 = c(brewer.pal(3,"Purples"))
+col4 = c(brewer.pal(3,"Greens"))
+col5 = c(brewer.pal(3,"PuRd"))
+
+data2017$loglamt_17_1000<-log(data2017$lamt_17_1000)
+data2018$loglamt_18_1000<-log(data2018$lamt_18_1000)
+data2019$loglamt_19_1000<-log(data2019$lamt_19_1000)
+data2020$loglamt_20_1000<-log(data2020$lamt_20_1000)
+
+# Target 
+pdf("boxplot_all.pdf", width=12, height=8.125) 
+par(mfrow=c(4,5))
+# 2017 Area Strata 1
+boxplot(data2017[which(data2017$areaid2==1),]$loglamt_17_1000~data2017[which(data2017$areaid2==1),]$depthid2,col=col1,
+        main="Target 2017 4X5YZ", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2017 Area Strata 2
+boxplot(data2017[which(data2017$areaid2==2),]$loglamt_17_1000~data2017[which(data2017$areaid2==2),]$depthid2,col=col2,
+        main="Target 2017 4W", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2017 Area Strata 3
+boxplot(data2017[which(data2017$areaid2==3),]$loglamt_17_1000~data2017[which(data2017$areaid2==3),]$depthid2,col=col3,
+        main="Target 2017 4V", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2017 Area Strata 4
+boxplot(data2017[which(data2017$areaid2==4),]$loglamt_17_1000~data2017[which(data2017$areaid2==4),]$depthid2,col=col4,
+        main="Target 2017 3P", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2017 Area Strata 5
+boxplot(data2017[which(data2017$areaid2==5),]$loglamt_17_1000~data2017[which(data2017$areaid2==5),]$depthid2,col=col5,
+        main="Target 2017 3NO", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+
+# 2018 Area Strata 1
+boxplot(data2018[which(data2018$areaid2==1),]$loglamt_18_1000~data2018[which(data2018$areaid2==1),]$depthid2,col=col1,
+         main="Target 2018 4X5YZ",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2018 Area Strata 2
+boxplot(data2018[which(data2018$areaid2==2),]$loglamt_18_1000~data2018[which(data2018$areaid2==2),]$depthid2,col=col2,
+        main="Target 2018 4W",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2018 Area Strata 3
+boxplot(data2018[which(data2018$areaid2==3),]$loglamt_18_1000~data2018[which(data2018$areaid2==3),]$depthid2,col=col3,
+         main="Target 2018 4V",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2018 Area Strata 4
+boxplot(data2018[which(data2018$areaid2==4),]$loglamt_18_1000~data2018[which(data2018$areaid2==4),]$depthid2,col=col4,
+        main="Target 2018 3P",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2018 Area Strata 5
+boxplot(data2018[which(data2018$areaid2==5),]$loglamt_18_1000~data2018[which(data2018$areaid2==5),]$depthid2,col=col5,
+         main="Target 2018 3NO",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+
+# 2019 Area Strata 1
+boxplot(data2019[which(data2019$areaid2==1),]$loglamt_19_1000~data2019[which(data2019$areaid2==1),]$depthid2,col=col1,
+         main="Target 2019 4X5YZ",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2019 Area Strata 2
+boxplot(data2019[which(data2019$areaid2==2),]$loglamt_19_1000~data2019[which(data2019$areaid2==2),]$depthid2,col=col2,
+        main="Target 2019 4W",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2019 Area Strata 3
+boxplot(data2019[which(data2019$areaid2==3),]$loglamt_19_1000~data2019[which(data2019$areaid2==3),]$depthid2,col=col3,
+         main="Target 2019 4V",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2019 Area Strata 4
+boxplot(data2019[which(data2019$areaid2==4),]$loglamt_19_1000~data2019[which(data2019$areaid2==4),]$depthid2,col=col4,
+        main="Target 2019 3P",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2019 Area Strata 5
+boxplot(data2019[which(data2019$areaid2==5),]$loglamt_19_1000~data2019[which(data2019$areaid2==5),]$depthid2,col=col5,
+         main="Target 2019 3NO",xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+
+# 2020 Area Strata 1
+boxplot(data2020[which(data2020$areaid2==1),]$loglamt_20_1000~data2020[which(data2020$areaid2==1),]$depthid2,col=col1,
+        main="Target 2020 4X5YZ", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2020 Area Strata 2
+boxplot(data2020[which(data2020$areaid2==2),]$loglamt_20_1000~data2020[which(data2020$areaid2==2),]$depthid2,col=col2,
+        main="Target 2020 4W", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2020 Area Strata 3
+boxplot(data2020[which(data2020$areaid2==3),]$loglamt_20_1000~data2020[which(data2020$areaid2==3),]$depthid2,col=col3,
+        main="Target 2020 4V", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2020 Area Strata 4
+boxplot(data2020[which(data2020$areaid2==4),]$loglamt_20_1000~data2020[which(data2020$areaid2==4),]$depthid2,col=col4,
+        main="Target 2020 3P", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+# 2020 Area Strata 5
+boxplot(data2020[which(data2020$areaid2==5),]$loglamt_20_1000~data2020[which(data2020$areaid2==5),]$depthid2,col=col5,
+        main="Target 2020 3NO", xlab="Depth Strata", ylab="Estimated survey indices (log)",ylim = c(-16, -7))
+
+dev.off() 
+
+```
+
+
+
